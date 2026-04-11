@@ -9,21 +9,33 @@ variables:
 
 steps:
 
+# Install .NET 8
 - task: UseDotNet@2
+  displayName: 'Install .NET 8'
   inputs:
     packageType: 'sdk'
     version: '8.x'
 
+# Restore
 - script: dotnet restore
-  displayName: 'Restore'
+  displayName: 'Restore packages'
 
+# Build
 - script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'Build'
+  displayName: 'Build project'
 
+# Pack NuGet
 - script: dotnet pack --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
-  displayName: 'Pack'
+  displayName: 'Pack NuGet package'
 
+# Authenticate with Azure Artifacts
 - task: NuGetAuthenticate@1
+  displayName: 'Authenticate NuGet'
 
-- script: dotnet nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" --source "REPLACE_WITH_YOUR_FEED_URL" --api-key az
-  displayName: 'Push Package'
+# Push package to Azure Artifacts
+- script: |
+    dotnet nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" \
+    --source "https://pkgs.dev.azure.com/jkau1146/_packaging/jkau1146/nuget/v3/index.json" \
+    --api-key az
+  displayName: 'Push NuGet package'
+

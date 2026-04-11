@@ -1,0 +1,29 @@
+trigger:
+- main
+
+pool:
+  name: Default   # self-hosted agent
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: dotnet restore
+  displayName: 'Restore'
+
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'Build'
+
+- script: dotnet pack --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+  displayName: 'Pack'
+
+- task: NuGetAuthenticate@1
+
+- script: dotnet nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" --source "REPLACE_WITH_YOUR_FEED_URL" --api-key az
+  displayName: 'Push Package'

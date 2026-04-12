@@ -24,12 +24,14 @@ steps:
 - script: dotnet pack --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)
   displayName: 'Pack NuGet package'
 
-# DEBUG STEP - see what files got created
-- script: dir "$(Build.ArtifactStagingDirectory)"
-  displayName: 'List staging directory'
-
 - task: NuGetAuthenticate@1
   displayName: 'Authenticate NuGet'
 
-- script: dotnet nuget push "$(Build.ArtifactStagingDirectory)\*.nupkg" --source "https://pkgs.dev.azure.com/jkau1146/_packaging/jkau1146/nuget/v3/index.json" --api-key az
+- task: NuGetCommand@2
   displayName: 'Push NuGet package'
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'jkau1146'
+    allowPackageConflicts: true

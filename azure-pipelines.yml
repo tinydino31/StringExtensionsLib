@@ -33,9 +33,5 @@ steps:
   displayName: 'Authenticate NuGet'
 
 # Push package to Azure Artifacts
-- script: |
-    dotnet nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" \
-    --source "https://pkgs.dev.azure.com/jkau1146/_packaging/jkau1146/nuget/v3/index.json" \
-    --api-key az
+- script: dotnet nuget push "$(Build.ArtifactStagingDirectory)/*.nupkg" --source "https://pkgs.dev.azure.com/jkau1146/_packaging/jkau1146/nuget/v3/index.json" --api-key az
   displayName: 'Push NuGet package'
-
